@@ -22,6 +22,8 @@ validity, further compiler passes are used to optimize the configuration
 before it is cached. For example, private services and abstract services
 are removed, and aliases are resolved.
 
+.. _components-dependency-injection-extension:
+
 Managing Configuration with Extensions
 --------------------------------------
 
@@ -59,7 +61,10 @@ A very simple extension may just load configuration files into the container::
     {
         public function load(array $configs, ContainerBuilder $container)
         {
-            $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+            $loader = new XmlFileLoader(
+                $container,
+                new FileLocator(__DIR__.'/../Resources/config')
+            );
             $loader->load('services.xml');
         }
 
@@ -223,7 +228,10 @@ but also load a secondary one only if a certain parameter is set::
         $processor = new Processor();
         $config = $processor->processConfiguration($configuration, $configs);
 
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new XmlFileLoader(
+            $container,
+            new FileLocator(__DIR__.'/../Resources/config')
+        );
         $loader->load('services.xml');
 
         if ($config['advanced']) {
@@ -237,6 +245,8 @@ but also load a secondary one only if a certain parameter is set::
     you cannot do it from another extension as it uses a fresh container.
     You should instead use a compiler pass which works with the full container
     after the extensions have been processed.
+
+.. _components-dependency-injection-compiler-passes:
 
 Creating a Compiler Pass
 ------------------------
@@ -277,7 +287,7 @@ will then be called when the container is compiled::
 
 .. note::
 
-    Compiler passes are registered differently is you are using the full
+    Compiler passes are registered differently if you are using the full
     stack framework, see :doc:`/cookbook/service_container/compiler_passes`
     for more details.
 
@@ -305,7 +315,12 @@ For example, to run your custom pass after the default removal passes have been 
     use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 
     $container = new ContainerBuilder();
-    $container->addCompilerPass(new CustomCompilerPass, PassConfig::TYPE_AFTER_REMOVING);
+    $container->addCompilerPass(
+        new CustomCompilerPass,
+        PassConfig::TYPE_AFTER_REMOVING
+    );
+
+.. _components-dependency-injection-dumping:
 
 Dumping the Configuration for Performance
 -----------------------------------------
@@ -351,7 +366,10 @@ it::
         $container->compile();
 
         $dumper = new PhpDumper($container);
-        file_put_contents($file, $dumper->dump(array('class' => 'MyCachedContainer')));
+        file_put_contents(
+            $file,
+            $dumper->dump(array('class' => 'MyCachedContainer'))
+        );
     }
 
 You will now get the speed of the PHP configured container with the ease of using
@@ -380,14 +398,17 @@ but getting an up to date configuration whilst developing your application::
 
         if (!$isDebug) {
             $dumper = new PhpDumper($container);
-            file_put_contents($file, $dumper->dump(array('class' => 'MyCachedContainer')));
+            file_put_contents(
+                $file,
+                $dumper->dump(array('class' => 'MyCachedContainer'))
+            );
         }
     }
 
 This could be further improved by only recompiling the container in debug
 mode when changes have been made to its configuration rather than on every
 request. This can be done by caching the resource files used to configure
-the container in the way describe in ":doc:`/components/config/caching`"
+the container in the way described in ":doc:`/components/config/caching`"
 in the config component documentation.
 
 You do not need to work out which files to cache as the container builder

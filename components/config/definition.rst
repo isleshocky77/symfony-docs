@@ -91,6 +91,20 @@ The root node itself is an array node, and has children, like the boolean
 node ``auto_connect`` and the scalar node ``default_connection``. In general:
 after defining a node, a call to ``end()`` takes you one step up in the hierarchy.
 
+Node type
+~~~~~~~~~
+
+It is possible to validate the type of a provided value by using the appropriate
+node definition. Node type are available for:
+
+* scalar
+* boolean
+* array
+* variable (no validation)
+
+and are created with ``node($name, $type)`` or their associated shortcut
+``xxxxNode($name)`` method.
+
 Array nodes
 ~~~~~~~~~~~
 
@@ -197,6 +211,35 @@ has a certain value:
             ->end()
         ->end()
     ;
+
+Optional Sections
+-----------------
+
+.. versionadded:: 2.1
+    The ``canBeEnabled`` and ``canBeDisabled`` methods are new in Symfony 2.2
+
+If you have entire sections which are optional and can be enabled/disabled,
+you can take advantage of the shortcut
+:method:`Symfony\\Component\\Config\\Definition\\Builder\\ArrayNodeDefinition::canBeEnabled` and
+:method:`Symfony\\Component\\Config\\Definition\\Builder\\ArrayNodeDefinition::canBeDisabled` methods::
+
+    $arrayNode
+        ->canBeEnabled()
+    ;
+
+    // is equivalent to
+
+    $arrayNode
+        ->treatFalseLike(array('enabled' => false))
+        ->treatTrueLike(array('enabled' => true))
+        ->treatNullLike(array('enabled' => true))
+        ->children()
+            ->booleanNode('enabled')
+                ->defaultFalse()
+    ;
+
+The ``canBeDisabled`` method looks about the same except that the section 
+would be enabled by default.
 
 Merging options
 ---------------
@@ -439,5 +482,8 @@ Otherwise the result is a clean array of configuration values::
 
     $processor = new Processor();
     $configuration = new DatabaseConfiguration;
-    $processedConfiguration = $processor->processConfiguration($configuration, $configs);
+    $processedConfiguration = $processor->processConfiguration(
+        $configuration,
+        $configs)
+    ;
 

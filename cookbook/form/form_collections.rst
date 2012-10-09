@@ -17,7 +17,8 @@ that Task, right inside the same form.
     of this tutorial that really care about "persistence".
     
     If you *are* using Doctrine, you'll need to add the Doctrine metadata,
-    including the ``ManyToMany`` on the Task's ``tags`` property.
+    including the ``ManyToMany`` association mapping definition on the Task's
+    ``tags`` property.
 
 Let's start there: suppose that each ``Task`` belongs to multiple ``Tags``
 objects. Start by creating a simple ``Task`` class::
@@ -177,7 +178,7 @@ In your controller, you'll now initialize a new instance of ``TaskType``::
             $form = $this->createForm(new TaskType(), $task);
 
             // process the form on POST
-            if ('POST' === $request->getMethod()) {
+            if ($request->isMethod('POST')) {
                 $form->bind($request);
                 if ($form->isValid()) {
                     // maybe do some form processing, like saving the Task and Tag objects
@@ -610,7 +611,7 @@ the relationship between the removed ``Tag`` and ``Task`` object.
           
             $editForm = $this->createForm(new TaskType(), $task);
 
-            if ('POST' === $request->getMethod()) {
+            if ($request->isMethod('POST')) {
                 $editForm->bind($this->getRequest());
 
                 if ($editForm->isValid()) {
